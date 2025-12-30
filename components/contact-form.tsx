@@ -8,15 +8,50 @@ export default function ContactForm() {
     email: "",
     phone: "",
     course: "",
-    time: "",
+    preferredTime: "",
     message: "",
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle form submission
-    console.log("Form submitted:", formData)
-  }
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Something went wrong");
+
+      setSuccess("🎉 Your enquiry has been sent successfully! We will contact you soon.");
+
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        course: "",
+        preferredTime: "",
+        message: "",
+      });
+    } catch (err: any) {
+      setError(err.message || "Failed to send. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
@@ -225,13 +260,13 @@ export default function ContactForm() {
 
               {/* Preferred Time */}
               <div>
-                <label htmlFor="time" className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
+                <label htmlFor="preferredTime" className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
                   Preferred Time
                 </label>
                 <select
-                  id="time"
-                  name="time"
-                  value={formData.time}
+                  id="preferredTime"
+                  name="preferredTime"
+                  value={formData.preferredTime}
                   onChange={handleChange}
                   className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl border-2 border-primary/30 bg-black/30 text-white text-sm sm:text-base focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                 >
@@ -260,10 +295,15 @@ export default function ContactForm() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-primary to-accent text-white py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg hover:shadow-lg hover:shadow-primary/50 transition-all hover:scale-105"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-primary to-accent text-white py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg hover:shadow-lg hover:shadow-primary/50 transition-all hover:scale-105 disabled:opacity-60"
               >
-                Submit Enquiry
+                {loading ? "Sending..." : "Submit Enquiry"}
               </button>
+              {success && <p className="text-green-400 font-medium mt-2 text-sm sm:text-base">{success}</p>}
+              {error && <p className="text-red-400 font-medium mt-2 text-sm sm:text-base">{error}</p>}
+
+
             </form>
           </div>
         </div>
