@@ -1,4 +1,4 @@
-"use client"
+// "use client"
 
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
@@ -21,8 +21,19 @@ export default function Navbar() {
   return (
     <nav className="relative z-40">
       {/* Top Section - Logo on Black Background */}
-      <div className="bg-black">
-        <div className="flex justify-center">
+      <div className="bg-black relative">
+        {/* Home Link - Top Left Corner */}
+        <Link 
+          href="/" 
+          className="absolute left-4 md:left-8 top-4 md:top-6 flex items-center gap-2 group"
+        >
+          <div className="h-1 w-6 bg-primary group-hover:bg-accent transition-colors" />
+          <span className="text-white text-xs md:text-sm font-medium tracking-wider group-hover:text-accent transition-colors">
+            HOME
+          </span>
+        </Link>
+
+        <div className="flex justify-center pt-8 md:pt-6">
           <Link href="/" className="flex items-center">
             <img
               src="/logo.png"
